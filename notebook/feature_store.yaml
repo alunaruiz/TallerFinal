@@ -1,0 +1,27 @@
+<<<<<<< HEAD
+project: my_project
+registry: data/registry.db
+
+provider:
+  name: local
+  local:
+    path: feast/warehouse
+
+online_store:
+  type: sqlite
+  path: data/online_store.db
+
+=======
+project: my_project
+registry: data/registry.db
+
+provider:
+  name: local
+  local:
+    path: feast/warehouse
+
+online_store:
+  type: sqlite
+  path: data/online_store.db
+
+>>>>>>> 013657a0b6cb1354e8ee7f16411b913eaaeb3427
