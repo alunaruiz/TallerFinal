@@ -1,0 +1,15 @@
+artifact_uri: file:///notebook/mlruns/270615145856518870/465965fc632b4940971d5e3599aed911/artifacts
+end_time: 1685300367603
+entry_point_name: ''
+experiment_id: '270615145856518870'
+lifecycle_stage: active
+run_id: 465965fc632b4940971d5e3599aed911
+run_name: polite-squid-523
+run_uuid: 465965fc632b4940971d5e3599aed911
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1685300084831
+status: 3
+tags: []
+user_id: root
