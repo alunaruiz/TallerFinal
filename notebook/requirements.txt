@@ -1,0 +1,9 @@
+mlflow
+catboost
+sklearn
+scikit-learn
+numpy
+mysql-connector-python
+feast
+protobuf==3.19.5
+pycaret==3.0.0
