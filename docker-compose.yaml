@@ -1,0 +1,152 @@
+version: '2'
+networks:
+  diabetes-network:
+services:
+#Servicio de MinIO
+  minio_service:
+    container_name: MinioService
+    command: server /data --console-address ":9000" --address ":9001"
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=supersecret
+      - MLFLOW_S3_ENDPOINT_URL=http://minio_service:9000
+      - MLFLOW_S3_IGNORE_TLS=true
+      - BACKEND_STORE_URI="mysql://root:123456@db_raw_data/db_raw_data"
+      - ARTIFACT_ROOT="s3://mlflows3/artifacts"
+      - MINIO_S3_STRICT_ACL=off
+      - MINIO_REGION_NAME=sa-east-1
+      - MINIO_BUCKET_NAME=mlflows3
+    image: quay.io/minio/minio:latest
+    ports:
+      - '9000:9000'
+    volumes:
+      - ./minio:/data    
+      - ./mlflow:/mlflow  
+    networks:
+      - diabetes-network
+    restart: unless-stopped
+#Servicio MlFlow
+  mlflow_service:
+    container_name: MLflowService
+    image: ghcr.io/mlflow/mlflow
+    ports:
+      - '6000:6000'
+    environment:
+      - BACKEND_STORE_URI="mysql://root:123456@db_raw_data/db_raw_data"
+      - ARTIFACT_ROOT="s3://mlflows3/artifacts"
+      - S3_USE_HTTPS="0"
+      - MLFLOW_S3_ENDPOINT_URL=http://minio_service:9001
+    volumes:
+      - ./mlflow:/mlflow
+      - ./minio:/data  
+    networks:
+      - diabetes-network
+    restart: unless-stopped
+#Servicio de AirFlow
+  airflow:
+    image: apache/airflow:latest
+    ports:
+      - '8080:8080'
+    environment:
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=mysql://root:123456@db_raw_data/db_raw_data
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./notebook/mlruns:/mlruns
+      - ./notebook/mlruns/270615145856518870:/270615145856518870
+    command: webserver
+    networks:
+      - diabetes-network
+  airflow_scheduler:
+    image: apache/airflow:latest
+    environment:
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=mysql://root:123456@db_raw_data/db_raw_data
+    volumes:
+      - ./dags:/opt/airflow/dags
+    command: scheduler
+    networks:
+      - diabetes-network
+
+  airflow_worker:
+    image: apache/airflow:latest
+    environment:
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=mysql://root:123456@db_raw_data/db_raw_data
+    volumes:
+      - ./dags:/opt/airflow/dags
+    command: worker
+    networks:
+      - diabetes-network
+#Base de datos MySQL para almacenar la data
+  db_clean_data:
+    container_name: db_clean_data
+    image: mysql
+    ports:
+      - 3305:3305
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: db_clean_data
+    hostname: db_clean_data
+    volumes:
+      - ./FS1:/var/lib/mysql
+    networks:
+      - diabetes-network
+#Base de datos MySQL RAW data
+  db_raw_data:
+    container_name: db_raw_data
+    image: mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: db_raw_data
+    hostname: db_raw_data
+    volumes:
+      - ./FS2:/var/lib/mysql
+    networks:
+      - diabetes-network
+#Base de datos MySQL Metadata
+  db_meta_data:
+    container_name: db_meta_data
+    image: mysql
+    ports:
+      - 3307:3307
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: db_meta_data
+    hostname: db_meta_data
+    volumes:
+      - ./FS3:/var/lib/mysql
+    networks:
+      - diabetes-network
+#API de consumo de datos
+  apidiabetes:
+    build: ./APIDIABETES
+    ports:
+      - "8502:8502"
+      - "8005:8005"
+    volumes:
+      - ./APIDIABETES:/APIDIABETES:rw
+      - ./F/data/diabetes:/F/data/diabetes:rw
+    environment:
+      MYSQL_HOST: db_clean_data
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 123456
+      MYSQL_DATABASE: db_clean_data
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 800M
+    networks:
+      - diabetes-network
+  jupyter:
+    build: ./notebook
+    ports:
+      - 6565:6565
+      - 6566:6566  
+      - 8888:8888 
+    volumes:
+      - ./notebook:/notebook:rw
+      - ./notebook/diabetes:/app/diabetes
+    networks:
+      - diabetes-network
