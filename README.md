@@ -14,3 +14,6 @@ Instrucciones:
 6. Generar la experimentación, la cual será cargada a Minio.
 7. Ingresar a http://10.43.102.113:8501/, donde se encuentra una App que pedirá cargar un archivo CSV, que deberá contener una fila de data en el formato requerido por el modelo, que ejecutará el modelo en producción en MLflow.
 8. El aplicativo generará la predicción. 
+
+Nota: se cuenta con video explicativo del procedimiento en el siguiente link:
+https://youtu.be/Er2ljl37ZCs
