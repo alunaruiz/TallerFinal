@@ -1,0 +1,13 @@
+<<<<<<< HEAD
+artifact_location: file:///home/estudiante/proyecto_final/mlruns/0
+creation_time: 1685321830059
+experiment_id: '0'
+last_update_time: 1685321830059
+=======
+artifact_location: file:///notebook/mlruns/0
+creation_time: 1685298115143
+experiment_id: '0'
+last_update_time: 1685298115143
+>>>>>>> 013657a0b6cb1354e8ee7f16411b913eaaeb3427
+lifecycle_stage: active
+name: Default
