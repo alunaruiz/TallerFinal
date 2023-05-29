@@ -1,0 +1,15 @@
+artifact_uri: file:///notebook/mlruns/270615145856518870/f8a843e41eed4c5a9448195cd5766f2b/artifacts
+end_time: 1685300791388
+entry_point_name: ''
+experiment_id: '270615145856518870'
+lifecycle_stage: active
+run_id: f8a843e41eed4c5a9448195cd5766f2b
+run_name: charming-fly-903
+run_uuid: f8a843e41eed4c5a9448195cd5766f2b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1685300507193
+status: 3
+tags: []
+user_id: root
